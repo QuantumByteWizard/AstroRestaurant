@@ -1,4 +1,4 @@
-import { Music, Umbrella, GlassWater } from "lucide-react";
+import { Music, Umbrella, Apple } from "lucide-react";
 
 const features = [
   {
@@ -12,9 +12,9 @@ const features = [
     description: "Experience a romantic dinner right on the beach with personalized service and a special menu. Advance reservation required."
   },
   {
-    icon: <GlassWater className="h-6 w-6 text-dark" />,
-    title: "Small Events Hosting",
-    description: "Celebrate special occasions with us! We can host small events, birthdays, and intimate gatherings with customized menus."
+    icon: <Apple className="h-6 w-6 text-dark" />,
+    title: "Healthy Food Options",
+    description: "We offer a variety of healthy and nutritious dishes prepared with locally-sourced ingredients, perfect for health-conscious diners."
   }
 ];
 
