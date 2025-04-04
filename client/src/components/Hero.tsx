@@ -19,7 +19,7 @@ const Hero = () => {
           </p>
           <Button 
             size="lg" 
-            className="bg-primary hover:bg-primary/90 text-dark font-semibold px-8 py-6 rounded-full text-lg shadow-lg"
+            className="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-6 rounded-full text-lg shadow-lg"
             onClick={() => {
               const bookingSection = document.getElementById('book');
               if (bookingSection) {
