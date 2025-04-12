@@ -9,5 +9,106 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    cursor: none; /* Hide default cursor when using custom cursor */
+  }
+
+  :root {
+    --primary-rgb: 255, 186, 8; /* Example RGB values for primary color */
+  }
+}
+
+/* Animation Utilities */
+@layer utilities {
+  .text-reveal-mask {
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  
+  .text-reveal-mask.revealed {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .fade-up.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scale-in {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .scale-in.revealed {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .floating-element {
+    will-change: transform;
+  }
+
+  /* Menu item animations */
+  .menu-item {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    will-change: transform, opacity, box-shadow;
+  }
+
+  .menu-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-item-image {
+    transition: transform 0.4s ease;
+    will-change: transform;
+  }
+
+  .menu-item:hover .menu-item-image {
+    transform: scale(1.1);
+  }
+
+  .menu-item-ingredients {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition-delay: 0.1s;
+  }
+
+  .menu-item:hover .menu-item-ingredients {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Cursor */
+.custom-cursor {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background-color: rgba(var(--primary-rgb), 0.3);
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hide custom cursor on mobile/touch devices */
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none;
+  }
+  
+  body {
+    cursor: auto; /* Restore default cursor on touch devices */
   }
 }

@@ -6,6 +6,9 @@ import { Flame, Leaf, AlertCircle } from "lucide-react";
 import SpinningDish from "./SpinningDish";
 import { useSpring, animated } from "react-spring";
 import InteractiveBackground from "./InteractiveBackground";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { applyMenuItemHover } from "@/lib/animations";
 
 type MenuCategory = "seafood" | "vegetarian" | "halal";
 
@@ -131,12 +134,36 @@ const Menu = () => {
     return () => clearTimeout(timer);
   }, [activeCategory]);
   
-  // Animation for title
-  const titleSpring = useSpring({
-    from: { opacity: 0, transform: "translateY(30px)" },
-    to: { opacity: 1, transform: "translateY(0px)" },
-    config: { tension: 100, friction: 14 }
-  });
+  // Initialize GSAP animations
+  useGSAP(() => {
+    // Apply hover animations to menu cards
+    document.querySelectorAll('.menu-item').forEach(item => {
+      applyMenuItemHover(item);
+    });
+    
+    // Apply text animations to title
+    gsap.from('.menu-title', {
+      opacity: 0,
+      y: 30,
+      duration: 1,
+      ease: 'power3.out'
+    });
+    
+    // Create floating animations for decoration
+    const floatElements = document.querySelectorAll('.menu-decoration');
+    floatElements.forEach(el => {
+      gsap.to(el, {
+        y: 'random(-15, 15)',
+        x: 'random(-10, 10)',
+        rotation: 'random(-5, 5)',
+        duration: 'random(3, 5)',
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 'random(0, 1)',
+      });
+    });
+  }, [activeCategory]); // Re-run when category changes
   
   const filteredItems = menuItems.filter(item => 
     item.category === activeCategory
@@ -161,15 +188,20 @@ const Menu = () => {
       <InteractiveBackground />
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
-        <animated.div style={titleSpring} className="text-center mb-16">
-          <h2 className="font-poppins font-bold text-3xl md:text-4xl mb-6 inline-block relative text-white">
+        <div className="text-center mb-16">
+          <h2 className="menu-title font-poppins font-bold text-3xl md:text-4xl mb-6 inline-block relative text-white animate-text">
             <span className="inline-block relative z-10">Our Menu</span>
             <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-teal-500 z-0"></span>
           </h2>
-          <p className="text-lg max-w-3xl mx-auto text-blue-100">
+          <p className="fade-up text-lg max-w-3xl mx-auto text-blue-100">
             From the freshest seafood to delightful vegetarian dishes, our menu offers something for everyone. Available for lunch and dinner daily.
           </p>
-        </animated.div>
+        </div>
+        
+        {/* Decorative floating elements */}
+        <div className="absolute top-20 left-10 menu-decoration w-8 h-8 rounded-full bg-teal-500/30 blur-sm"></div>
+        <div className="absolute bottom-32 right-12 menu-decoration w-12 h-12 rounded-full bg-blue-500/20 blur-sm"></div>
+        <div className="absolute top-1/3 right-16 menu-decoration w-6 h-6 rounded-full bg-yellow-500/20 blur-sm"></div>
         
         <div className="flex flex-wrap justify-center gap-4 mb-16">
           <Button

@@ -277,10 +277,11 @@ export const initCustomCursor = () => {
 // Smooth scrolling for anchor links
 export const initSmoothScrolling = () => {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', (e: MouseEvent) => {
+    anchor.addEventListener('click', (e) => {
       e.preventDefault();
       
-      const targetId = (e.currentTarget as HTMLAnchorElement).getAttribute('href');
+      const element = e.currentTarget as HTMLAnchorElement;
+      const targetId = element.getAttribute('href');
       if (!targetId || targetId === '#') return;
       
       const targetElement = document.querySelector(targetId);
@@ -299,12 +300,6 @@ export const initSmoothScrolling = () => {
 
 // Initialize all animations
 export const initAnimations = () => {
-  // Setup ScrollTrigger defaults
-  ScrollTrigger.defaults({
-    markers: false, // Set to true for debugging
-    toggleActions: "play none none reverse",
-  });
-  
   // Initialize custom cursor and smooth scrolling
   initCustomCursor();
   initSmoothScrolling();
@@ -318,6 +313,11 @@ export const initAnimations = () => {
   // Apply menu hover interactions
   document.querySelectorAll('.menu-item').forEach(item => {
     applyMenuItemHover(item);
+  });
+  
+  // Apply floating animations to background elements
+  document.querySelectorAll('.floating-element').forEach(el => {
+    createFloatingAnimation(el);
   });
 };
 
