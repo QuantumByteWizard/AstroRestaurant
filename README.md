@@ -60,8 +60,8 @@ If you want to run this project locally, here's how:
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/astro-restaurant.git
-   cd astro-restaurant
+   git clone https://github.com/QuantumByteWizard/AstroRestaurant.git
+   cd AstroRestaurant
    ```
 
 2. Install dependencies:
@@ -126,6 +126,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - The React and Express communities for the amazing documentation
 - My friends who tested the site and provided valuable feedback
 
----
-
-Built with ❤️ and 🌊 by [Your Name]
+---;

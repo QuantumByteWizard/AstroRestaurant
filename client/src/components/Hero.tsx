@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import ThreeDScene from "./ThreeDScene";
 import { useSpring, animated } from "react-spring";
+import LobsterModel from "./LobsterModel";
 
 const Hero = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -53,6 +54,9 @@ const Hero = () => {
       
       {/* 3D Scene */}
       <ThreeDScene className="opacity-60" />
+      
+      {/* 3D Lobster Model */}
+      <LobsterModel className="z-20" />
       
       {/* Content */}
       <div className="container mx-auto px-6 md:px-12 relative z-10 flex items-center h-full">
