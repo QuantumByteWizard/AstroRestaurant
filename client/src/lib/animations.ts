@@ -102,24 +102,28 @@ export const animateSection = (selector: string) => {
 export const applyMenuItemHover = (item: Element) => {
   const timeline = gsap.timeline({ paused: true });
   
-  // Scale effect
+  // Enhanced scale and shadow effect
   timeline.to(item, {
-    scale: 1.05,
-    duration: 0.3,
-    ease: easing.smooth,
-    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+    y: -8,
+    scale: 1.02,
+    duration: 0.4,
+    ease: "back.out(1.7)",
+    boxShadow: "0 15px 30px rgba(0, 200, 200, 0.1), 0 5px 15px rgba(0, 200, 200, 0.05)",
   });
   
   // Find image and info elements inside the menu item
-  const image = item.querySelector('.menu-item-image');
+  const image = item.querySelector('.menu-item-image img');
   const info = item.querySelector('.menu-item-info');
   const ingredient = item.querySelector('.menu-item-ingredients');
+  const title = item.querySelector('h3');
+  const price = item.querySelector('.menu-item-info span');
   
   if (image) {
     timeline.to(image, {
       scale: 1.1,
-      duration: 0.4,
-      ease: easing.smooth,
+      rotate: 1,
+      duration: 0.6,
+      ease: "power2.out",
     }, 0); // start at the same time
   }
   
@@ -129,6 +133,22 @@ export const applyMenuItemHover = (item: Element) => {
       duration: 0.4,
       ease: easing.smooth,
     }, 0);
+  }
+  
+  if (title) {
+    timeline.to(title, {
+      color: "#38b2ac", // teal-500
+      duration: 0.3,
+      ease: "sine.out",
+    }, 0);
+  }
+  
+  if (price) {
+    timeline.to(price, {
+      scale: 1.1,
+      duration: 0.3,
+      ease: "back.out(1.5)",
+    }, 0.1);
   }
   
   if (ingredient) {
@@ -321,6 +341,188 @@ export const initAnimations = () => {
   });
 };
 
+// Character-by-character text animation
+export const animateCharacters = (element: string | Element, options = {}) => {
+  const defaults = {
+    staggerTime: 0.02,
+    duration: 0.5,
+    ease: easing.smooth,
+    delay: 0,
+    y: 20,
+    opacity: 0
+  };
+  
+  const config = { ...defaults, ...options };
+  const targets = typeof element === "string" ? document.querySelectorAll(element) : [element];
+  
+  targets.forEach(target => {
+    if (!target) return;
+    
+    // Get the original text
+    const text = target.textContent || "";
+    target.textContent = "";
+    
+    // Create a span for each character
+    const chars = text.split("");
+    chars.forEach(char => {
+      const charSpan = document.createElement("span");
+      charSpan.textContent = char;
+      charSpan.classList.add("char");
+      target.appendChild(charSpan);
+    });
+    
+    // Create animation for each character
+    gsap.from(target.querySelectorAll('.char'), {
+      opacity: config.opacity,
+      y: config.y,
+      duration: config.duration,
+      stagger: config.staggerTime,
+      ease: config.ease,
+      delay: config.delay,
+    });
+  });
+};
+
+// Split text into lines and animate
+export const splitTextIntoLines = (element: string | Element, options = {}) => {
+  const defaults = {
+    staggerTime: 0.15,
+    duration: 0.8,
+    ease: easing.smooth,
+    delay: 0
+  };
+  
+  const config = { ...defaults, ...options };
+  const target = typeof element === "string" ? document.querySelector(element) : element;
+  
+  if (!target) return;
+  
+  // Get original text and container width
+  const text = target.textContent || "";
+  const containerWidth = target.clientWidth;
+  target.textContent = "";
+  
+  // Create container for lines
+  const linesContainer = document.createElement("div");
+  linesContainer.style.position = "relative";
+  linesContainer.style.overflow = "hidden";
+  target.appendChild(linesContainer);
+  
+  // Create a temporary element to measure words
+  const tempEl = document.createElement("div");
+  tempEl.style.position = "absolute";
+  tempEl.style.visibility = "hidden";
+  tempEl.style.whiteSpace = "nowrap";
+  document.body.appendChild(tempEl);
+  
+  const words = text.split(" ");
+  let lines: string[] = [];
+  let currentLine = "";
+  
+  // Calculate where line breaks should occur
+  words.forEach(word => {
+    tempEl.textContent = currentLine + " " + word;
+    if (tempEl.clientWidth > containerWidth && currentLine !== "") {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine += (currentLine ? " " : "") + word;
+    }
+  });
+  
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  // Clean up temp element
+  document.body.removeChild(tempEl);
+  
+  // Create line elements with reveal animation
+  lines.forEach((line, index) => {
+    const lineEl = document.createElement("div");
+    lineEl.className = "text-reveal-line";
+    lineEl.style.overflow = "hidden";
+    lineEl.style.position = "relative";
+    
+    const textEl = document.createElement("div");
+    textEl.textContent = line;
+    textEl.style.display = "inline-block";
+    textEl.style.transform = "translateY(100%)";
+    
+    lineEl.appendChild(textEl);
+    linesContainer.appendChild(lineEl);
+    
+    // Animate each line with staggered timing
+    gsap.to(textEl, {
+      y: 0,
+      duration: config.duration,
+      delay: config.delay + index * config.staggerTime,
+      ease: config.ease,
+    });
+  });
+};
+
+// Reveal elements as they enter viewport
+export const createScrollRevealAnimation = (selector: string, options = {}) => {
+  const defaults = {
+    origin: 'bottom',
+    distance: '30px',
+    duration: 0.8,
+    delay: 0,
+    interval: 0.1,
+  };
+  
+  const config = { ...defaults, ...options };
+  const elements = document.querySelectorAll(selector);
+  
+  if (elements.length === 0) return;
+  
+  elements.forEach((el, index) => {
+    // Initial state
+    let startProps: any = { opacity: 0 };
+    
+    switch (config.origin) {
+      case 'left':
+        startProps.x = `-${config.distance}`;
+        break;
+      case 'right':
+        startProps.x = config.distance;
+        break;
+      case 'top':
+        startProps.y = `-${config.distance}`;
+        break;
+      default: // bottom
+        startProps.y = config.distance;
+    }
+    
+    gsap.set(el, startProps);
+    
+    // Create IntersectionObserver to trigger animation
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = config.delay + (index * config.interval);
+            
+            gsap.to(entry.target, {
+              opacity: 1,
+              x: 0,
+              y: 0,
+              duration: config.duration,
+              delay,
+              ease: "power2.out",
+              onComplete: () => observer.unobserve(entry.target)
+            });
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(el);
+  });
+};
+
 export default {
   easing,
   animateText,
@@ -329,4 +531,7 @@ export default {
   createFloatingAnimation,
   createParallaxEffect,
   initAnimations,
+  animateCharacters,
+  splitTextIntoLines,
+  createScrollRevealAnimation
 };

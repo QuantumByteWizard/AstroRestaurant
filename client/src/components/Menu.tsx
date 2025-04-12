@@ -142,18 +142,50 @@ const Menu = () => {
       applyMenuItemHover(item);
     });
     
-    // Create floating animations for decoration elements
+    // Animate the menu title with character animation
+    const titleEl = document.querySelector('.menu-title-text');
+    if (titleEl && !titleEl.hasAttribute('data-animated')) {
+      // Animate characters for a more sophisticated effect
+      const textContent = titleEl.textContent || '';
+      titleEl.innerHTML = '';
+      titleEl.setAttribute('data-animated', 'true');
+      
+      textContent.split('').forEach((char, index) => {
+        const span = document.createElement('span');
+        span.className = 'char';
+        span.textContent = char;
+        span.style.opacity = '0';
+        span.style.transform = 'translateY(20px)';
+        span.style.display = 'inline-block';
+        titleEl.appendChild(span);
+      });
+      
+      gsap.to('.menu-title-text .char', {
+        opacity: 1,
+        y: 0,
+        stagger: 0.03,
+        duration: 0.5,
+        ease: 'back.out(1.2)',
+        delay: 0.2
+      });
+    }
+    
+    // Create floating animations for decoration elements with varied parameters
     const floatElements = document.querySelectorAll('.menu-decoration');
-    floatElements.forEach(el => {
+    floatElements.forEach((el, index) => {
+      // Create different animation parameters for each element
+      const duration = 3 + (index % 3); // 3, 4, or 5 seconds
+      const amplitude = 10 + (index * 5); // Different ranges
+      
       gsap.to(el, {
-        y: gsap.utils.random(-15, 15),
-        x: gsap.utils.random(-10, 10),
+        y: gsap.utils.random(-amplitude, amplitude),
+        x: gsap.utils.random(-amplitude/2, amplitude/2),
         rotation: gsap.utils.random(-5, 5),
-        duration: gsap.utils.random(3, 5),
+        duration: duration,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
-        delay: gsap.utils.random(0, 1),
+        delay: index * 0.2,
       });
     });
     
@@ -165,12 +197,23 @@ const Menu = () => {
         y: 0,
         stagger: 0.1,
         duration: 0.8,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-        }
+        ease: 'power2.out'
       });
+    }
+    
+    // Add an additional entrance effect for the first menu item
+    const firstMenuItem = document.querySelector('.menu-item-container');
+    if (firstMenuItem && visibleItems.length > 0) {
+      gsap.fromTo(firstMenuItem, 
+        { scale: 0.9, boxShadow: "0 0 0 rgba(0, 200, 200, 0)" },
+        { 
+          scale: 1,
+          boxShadow: "0 15px 30px rgba(0, 200, 200, 0.1), 0 5px 15px rgba(0, 200, 200, 0.05)",
+          duration: 0.8,
+          ease: "elastic.out(1, 0.5)",
+          delay: 0.3
+        }
+      );
     }
   }, [activeCategory, visibleItems]); // Re-run when category or visible items change
   

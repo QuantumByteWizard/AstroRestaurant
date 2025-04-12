@@ -19,6 +19,7 @@
 
 /* Animation Utilities */
 @layer utilities {
+  /* Text reveal animation */
   .text-reveal-mask {
     clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
     transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
@@ -28,6 +29,20 @@
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
   }
 
+  /* Character split animation */
+  .char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  
+  .char.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Standard animations */
   .fade-up {
     opacity: 0;
     transform: translateY(20px);
@@ -39,15 +54,46 @@
     transform: translateY(0);
   }
 
+  .fade-in {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .fade-in.revealed {
+    opacity: 1;
+  }
+
   .scale-in {
     opacity: 0;
     transform: scale(0.9);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
 
   .scale-in.revealed {
     opacity: 1;
     transform: scale(1);
+  }
+
+  .slide-left {
+    opacity: 0;
+    transform: translateX(-30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .slide-left.revealed {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .slide-right {
+    opacity: 0;
+    transform: translateX(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .slide-right.revealed {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .floating-element {
@@ -56,22 +102,26 @@
 
   /* Menu item animations */
   .menu-item {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.4s ease, 
+                background-color 0.3s ease;
     will-change: transform, opacity, box-shadow;
   }
 
   .menu-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 200, 200, 0.1), 
+                0 5px 15px rgba(0, 200, 200, 0.05);
   }
 
   .menu-item-image {
-    transition: transform 0.4s ease;
+    transition: transform 0.6s ease;
     will-change: transform;
+    overflow: hidden;
   }
 
-  .menu-item:hover .menu-item-image {
-    transform: scale(1.1);
+  .menu-item:hover .menu-item-image img {
+    transform: scale(1.1) rotate(1deg);
   }
 
   .menu-item-ingredients {
@@ -84,6 +134,30 @@
   .menu-item:hover .menu-item-ingredients {
     opacity: 1;
     transform: translateY(0);
+  }
+  
+  /* Button hover animations */
+  .btn-hover-effect {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-hover-effect::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+  }
+  
+  .btn-hover-effect:hover::after {
+    width: 300%;
+    height: 300%;
   }
 }
 
