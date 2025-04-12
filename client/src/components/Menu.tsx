@@ -4,8 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, Leaf, AlertCircle } from "lucide-react";
 import SpinningDish from "./SpinningDish";
-import { useSpring, animated } from "react-spring";
 import InteractiveBackground from "./InteractiveBackground";
+
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { applyMenuItemHover } from "@/lib/animations";
@@ -86,6 +86,7 @@ const Menu = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
+  const menuCardsRef = useRef<HTMLDivElement>(null);
   
   // Effect for revealing items on scroll
   useEffect(() => {
@@ -141,29 +142,37 @@ const Menu = () => {
       applyMenuItemHover(item);
     });
     
-    // Apply text animations to title
-    gsap.from('.menu-title', {
-      opacity: 0,
-      y: 30,
-      duration: 1,
-      ease: 'power3.out'
-    });
-    
-    // Create floating animations for decoration
+    // Create floating animations for decoration elements
     const floatElements = document.querySelectorAll('.menu-decoration');
     floatElements.forEach(el => {
       gsap.to(el, {
-        y: 'random(-15, 15)',
-        x: 'random(-10, 10)',
-        rotation: 'random(-5, 5)',
-        duration: 'random(3, 5)',
+        y: gsap.utils.random(-15, 15),
+        x: gsap.utils.random(-10, 10),
+        rotation: gsap.utils.random(-5, 5),
+        duration: gsap.utils.random(3, 5),
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
-        delay: 'random(0, 1)',
+        delay: gsap.utils.random(0, 1),
       });
     });
-  }, [activeCategory]); // Re-run when category changes
+    
+    // Reveal elements that should be visible when the section appears
+    const fadeElements = document.querySelectorAll('.fade-up:not(.revealed)');
+    if (fadeElements.length > 0) {
+      gsap.to(fadeElements, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 80%',
+        }
+      });
+    }
+  }, [activeCategory, visibleItems]); // Re-run when category or visible items change
   
   const filteredItems = menuItems.filter(item => 
     item.category === activeCategory
@@ -189,11 +198,11 @@ const Menu = () => {
       
       <div className="container mx-auto px-6 md:px-12 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="menu-title font-poppins font-bold text-3xl md:text-4xl mb-6 inline-block relative text-white animate-text">
-            <span className="inline-block relative z-10">Our Menu</span>
+          <h2 className="menu-title font-poppins font-bold text-3xl md:text-4xl mb-6 inline-block relative text-white">
+            <span className="menu-title-text inline-block relative z-10">Our Menu</span>
             <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-2 bg-teal-500 z-0"></span>
           </h2>
-          <p className="fade-up text-lg max-w-3xl mx-auto text-blue-100">
+          <p className="menu-description fade-up text-lg max-w-3xl mx-auto text-blue-100 revealed">
             From the freshest seafood to delightful vegetarian dishes, our menu offers something for everyone. Available for lunch and dinner daily.
           </p>
         </div>
@@ -242,26 +251,25 @@ const Menu = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" ref={menuCardsRef}>
           {filteredItems.map((item) => {
             // Animation spring for each card
             const isVisible = visibleItems.includes(item.id);
             
             return (
-              <animated.div 
+              <div 
                 key={item.id} 
+                className={`menu-item-container fade-up ${isVisible ? "revealed" : ""}`}
                 style={{
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? "translateY(0px)" : "translateY(40px)",
-                  transition: `opacity 0.5s ease-out ${item.id * 0.1}s, transform 0.5s ease-out ${item.id * 0.1}s`
+                  transitionDelay: `${item.id * 0.1}s`
                 }}
               >
                 <Card 
-                  className="overflow-hidden shadow-lg bg-white/10 backdrop-blur-sm hover:shadow-teal-500/20 transition-all duration-300 hover:scale-105 border-0"
+                  className="menu-item overflow-hidden shadow-lg bg-white/10 backdrop-blur-sm border-0"
                   onMouseEnter={() => handleCardHover(item)}
                   onMouseLeave={handleCardLeave}
                 >
-                  <div className="h-64 overflow-hidden relative">
+                  <div className="menu-item-image h-64 overflow-hidden relative">
                     {item.isSignature && (
                       <Badge className="absolute top-4 right-4 bg-teal-500 text-white font-semibold z-10">
                         Signature
@@ -274,7 +282,7 @@ const Menu = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   </div>
-                  <CardContent className="p-6 text-white">
+                  <CardContent className="menu-item-info p-6 text-white">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-poppins font-semibold text-xl">{item.name}</h3>
                       <span className="text-teal-400 font-bold">{item.price}</span>
@@ -283,14 +291,14 @@ const Menu = () => {
                       {item.description}
                     </p>
                     {item.tags && item.tags.length > 0 && (
-                      <div className="flex items-center">
+                      <div className="menu-item-ingredients flex items-center">
                         {item.tags[0].icon}
                         <span className="text-sm ml-2 text-gray-200">{item.tags[0].text}</span>
                       </div>
                     )}
                   </CardContent>
                 </Card>
-              </animated.div>
+              </div>
             );
           })}
         </div>
