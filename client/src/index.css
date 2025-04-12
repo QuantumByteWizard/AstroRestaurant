@@ -9,7 +9,7 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    cursor: none; /* Hide default cursor when using custom cursor */
+    cursor: auto; /* Restore default cursor */
   }
 
   :root {

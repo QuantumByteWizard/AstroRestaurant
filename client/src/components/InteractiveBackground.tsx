@@ -102,27 +102,6 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({
     const particles = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particles);
     
-    // Track mouse position for interactivity
-    const mouse = new THREE.Vector2();
-    const mouseSpeed = new THREE.Vector2();
-    let lastMouseX = 0;
-    let lastMouseY = 0;
-    
-    const handleMouseMove = (event: MouseEvent) => {
-      // Calculate normalized device coordinates
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-      
-      // Calculate mouse speed
-      mouseSpeed.x = mouse.x - lastMouseX;
-      mouseSpeed.y = mouse.y - lastMouseY;
-      
-      lastMouseX = mouse.x;
-      lastMouseY = mouse.y;
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    
     // Handle window resize
     const handleResize = () => {
       if (!container) return;
@@ -146,11 +125,6 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({
         positions[i * 3] += velocities[i].x;
         positions[i * 3 + 1] += velocities[i].y;
         positions[i * 3 + 2] += velocities[i].z;
-        
-        // Apply interactive force based on mouse movement
-        const force = interactivity * 0.02;
-        velocities[i].x += mouseSpeed.x * force;
-        velocities[i].y += mouseSpeed.y * force;
         
         // Add some natural movement
         velocities[i].x += (Math.random() - 0.5) * 0.001;
@@ -188,7 +162,6 @@ const InteractiveBackground: React.FC<InteractiveBackgroundProps> = ({
         container.removeChild(renderer.domElement);
       }
       
-      window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
       
       // Dispose of resources
